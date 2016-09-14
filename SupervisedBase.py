@@ -66,3 +66,4 @@ class SupervisedBaseClass(object):
     if output:
       print "Accurary: %.2f" % precious
     return precious
+
