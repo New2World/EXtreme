@@ -76,6 +76,13 @@ class FNN(object):
     probs = exp_scores/np.sum(exp_scores, axis=1, keepdims=True)
     return probs
   
+  def calc_error(self, delta, y):
+    log_prob = -np.log(delta[range(delta.shape[0]), y])
+    loss = np.sum(log_prob)
+    regularizer_loss = sum(map(lambda x: np.sum(np.square(x)), self.W))
+    loss += self.reg_lambda/2*regularizer_loss
+    return loss/len(y)
+  
   def forwardpropagation(self, X):
     """
     X is a sample with shape (batch_size, feature)
@@ -89,8 +96,10 @@ class FNN(object):
   def backpropagation(self, z, y, batch_size):
     """
     derivation of the standard BackPropagation Algorithm
+    return error value
     """
     delta = self.softmax(z)
+    error = self.calc_error(delta, y)
     delta[range(batch_size), y] -= 1	# NICE CODE
     for i in xrange(self.layers-2, -1, -1):
       dW = (self.val[i].T).dot(delta)+self.reg_lambda*self.W[i]
@@ -98,8 +107,9 @@ class FNN(object):
       delta = delta.dot(self.W[i].T)*self.activation['derivation'](self.val[i])
       self.W[i] += -self.eta*dW
       self.b[i] += -self.eta*db
+    return error
   
-  def train(self, X, y, batch_size=32, epoch=100):
+  def train(self, X, y, batch_size=32, epoch=100, show_procedure=True):
     """
     forward propagation & backpropagation
     """
@@ -109,12 +119,11 @@ class FNN(object):
     print r'Start training...'
     
     for i in xrange(1, epoch+1):
-      
-      print "Training Epoch #%d" % i
-      
       batch_train, batch_label = self.get_batch(X, y, batch_size)
       output_prob = self.forwardpropagation(batch_train)
-      self.backpropagation(output_prob, batch_label, batch_size)
+      error = self.backpropagation(output_prob, batch_label, batch_size)
+      if show_procedure:
+        print "Epoch #%d: loss: %.6f" % (i, error)
       self.val = []
   
   def predict(self, X):
@@ -127,3 +136,11 @@ class FNN(object):
     output_label = np.argmax(output_prob, axis=1)
     self.val = []
     return output_label
+  
+  def evaluate(self, X, y):
+    """
+    predict with forward propagation and evaluate the result
+    """
+    output_label = self.predict(X)
+    accuracy = 1.*len([item for item in zip(output_label, y) if item[0] == item[1]])/len(y)
+    print "Accuracy: %.6f" % accuracy
