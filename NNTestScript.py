@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn import datasets
-from BP import FNN
+from BPNN import FNN
 
 iris = datasets.load_digits()
 idx = np.random.uniform(0, 1500, (1500, )).astype('int')
