@@ -31,6 +31,9 @@ class FNN(object):
       func['activation'] = lambda x: (np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
 #      func['activation'] = np.tanh
       func['derivation'] = lambda x: 1-np.power(x, 2)
+    elif activation == 'relu':
+      func['activation'] = lambda x: max(0,x)
+      func['derivation'] = lambda x: max(0,x/abs(x))
     return func
   
   def get_batch(self, X, y, batch_size):
