@@ -1,9 +1,8 @@
 import numpy as np
-import scipy as sp
 
-class SupervisedBaseClass(object):
+class SupervisedBaseClass():
 
-    def formatData(self, *data):
+    def _format_batch(self, *data):
         """
         convert list to np.ndarray, and get rid of the redundant dimension
         """
@@ -17,35 +16,27 @@ class SupervisedBaseClass(object):
                     item.reshape(shape[1:])
                     shape = item.shape
             result.append(item)
+        if len(result) == 1:
+            return result[0]
         return result
 
-    def loadData(self, fileName):
-        """
-        load data from the given file
-        """
-        X = []; y = []
-        with open(fileName, 'r') as dataFile:
-            for dataLine in dataFile:
-                data = dataLine.split()
-                X.append(data[:-1])
-                y.append(data[-1])
-        return X, y
-
-    def _initSize(self, X, y):
-        self.sample, self.feature = X.shape
-        self.K = len(set(y))
-
-    def _errorCalc(self, pred, y):
+    def _error_calc(self, pred, y):
+        '''
+        defined by sub-class
+        '''
         pass
 
     def _update(self, X, pred, y, err):
+        '''
+        defined by sub-class
+        '''
         pass
 
     def _optimize_gd(self, X, y, max_iter, tol):
         error = 0
         for t in xrange(max_iter):
             pred = self.predict(X)
-            err = self._errorCalc(pred, y)
+            err = self._error_calc(pred, y)
             error = err[0]
             self._update(X, pred, y, err)
             if error < tol:  break
@@ -53,10 +44,11 @@ class SupervisedBaseClass(object):
     def predict(self, X):
         """
         output list
+        defined by sub-class
         """
         pass
 
-    def score(self, X, y, output=True):
+    def eval(self, X, y, output=True):
         """
         calculate the accurary of the model
         """
