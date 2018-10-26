@@ -2,7 +2,7 @@ import numpy as np
 import random as rd
 import copy as cp
 
-class FNN(object):
+class FNN():
     W = []
     b = []
     val = []
@@ -21,10 +21,10 @@ class FNN(object):
         self.eta = eta
         self.layers = len(layer_nodes)
         self.layer_nodes = layer_nodes
-        self.activation = self.parse_activation(activation)
-        self.build_model(weight, bias)
+        self.activation = self.__parse_activation(activation)
+        self.__build_model(weight, bias)
 
-    def parse_activation(self, activation):
+    def __parse_activation(self, activation):
         """
         get the activation and its corresponding derivation
         """
@@ -40,15 +40,15 @@ class FNN(object):
             func['derivation'] = lambda x: max(0,x/abs(x))
         return func
 
-    def get_batch(self, X, y, batch_size):
+    def __get_batch(self, X, y, batch_size):
         """
         choose batch data randomly, with some repeat items
         """
-        idx = np.random.uniform(0, self.sample, (batch_size, ))
-        idx = idx.astype('int')
-        return X[idx,:], y[idx]
+        rand_idx = np.random.uniform(0, self.sample, (batch_size, ))
+        rand_idx = rand_idx.astype('int')
+        return X[rand_idx,:], y[rand_idx]
 
-    def format_data(self, *data):
+    def __format_data(self, *data):
         """
         turn list into np.ndarray
         """
@@ -62,7 +62,7 @@ class FNN(object):
             return after[0]
         return after
 
-    def build_model(self, weight, bias):
+    def __build_model(self, weight, bias):
         """
         W is the weight with shape consist of two interfacing layers
         b is the bias
@@ -79,7 +79,7 @@ class FNN(object):
         else:
             self.b = cp.deepcopy(bias)
 
-    def softmax(self, arr):
+    def __softmax(self, arr):
         """
         softmax
         """
@@ -87,14 +87,14 @@ class FNN(object):
         probs = exp_scores/np.sum(exp_scores, axis=1, keepdims=True)
         return probs
 
-    def calc_error(self, delta, y):
+    def __calc_error(self, delta, y):
         log_prob = -np.log(delta[range(delta.shape[0]), y])
         loss = np.sum(log_prob)
         regularizer_loss = sum(map(lambda x: np.sum(np.square(x)), self.W))
         loss += self.reg_lambda/2*regularizer_loss
         return loss/len(y)
 
-    def forwardpropagation(self, X):
+    def __forwardpropagation(self, X):
         """
         X is a sample with shape (batch_size, feature)
         """
@@ -104,13 +104,13 @@ class FNN(object):
             self.val.append(self.activation['activation'](z))
         return self.val[-1].dot(self.W[self.layers-2])+self.b[self.layers-2]
 
-    def backpropagation(self, z, y, batch_size):
+    def __backpropagation(self, z, y, batch_size):
         """
         derivation of the standard BackPropagation Algorithm
         return error value
         """
-        delta = self.softmax(z)
-        error = self.calc_error(delta, y)
+        delta = self.__softmax(z)
+        error = self.__calc_error(delta, y)
         delta[range(batch_size), y] -= 1	# NICE CODE
         for i in xrange(self.layers-2, -1, -1):
             dW = (self.val[i].T).dot(delta)+self.reg_lambda*self.W[i]
@@ -124,15 +124,15 @@ class FNN(object):
         """
         forward propagation & backpropagation
         """
-        X, y = self.format_data(X, y)
+        X, y = self.__format_data(X, y)
         self.sample, self.feature = X.shape
 
         print r'Start training...'
 
         for i in xrange(1, epoch+1):
-            batch_train, batch_label = self.get_batch(X, y, batch_size)
-            output_prob = self.forwardpropagation(batch_train)
-            error = self.backpropagation(output_prob, batch_label, batch_size)
+            batch_train, batch_label = self.__get_batch(X, y, batch_size)
+            output_prob = self.__forwardpropagation(batch_train)
+            error = self.__backpropagation(output_prob, batch_label, batch_size)
             if show_procedure:
                 print "Epoch #%d: loss: %.6f" % (i, error)
             self.val = []
@@ -141,14 +141,14 @@ class FNN(object):
         """
         its kernel is the forward propagation precedure
         """
-        X = self.format_data(X)
-        output = self.forwardpropagation(X)
-        output_prob = self.softmax(output)
+        X = self.__format_data(X)
+        output = self.__forwardpropagation(X)
+        output_prob = self.__softmax(output)
         output_label = np.argmax(output_prob, axis=1)
         self.val = []
         return output_label
 
-    def evaluate(self, X, y):
+    def eval(self, X, y):
         """
         predict with forward propagation and evaluate the result
         """
