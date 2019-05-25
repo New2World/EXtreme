@@ -34,7 +34,7 @@ class SupervisedBaseClass():
 
     def _optimize_gd(self, X, y, max_iter, tol):
         error = 0
-        for t in xrange(max_iter):
+        for t in range(max_iter):
             pred = self.predict(X)
             err = self._error_calc(pred, y)
             error = err[0]
@@ -56,5 +56,5 @@ class SupervisedBaseClass():
         y = np.array(y); _y = np.array(_y)
         precious = 1-(1.0*len(np.nonzero(y-_y)[0])/len(y))
         if output:
-            print "Accurary: %.2f" % precious
+            print (f"Accurary: {precious}")
         return precious

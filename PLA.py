@@ -8,7 +8,7 @@ class Perceptron(SupervisedBaseClass):
         self.tol = tol
 
     def __sign(self, arr):
-        for i in xrange(len(arr)):
+        for i in range(len(arr)):
             if arr[i] < 0:
                 arr[i] = -1
             else:

@@ -24,10 +24,9 @@ class Softmax(SupervisedBaseClass):
         self.__init_arg(X, y)
         X = X.T
         loop = 0
-        print 'training...'
         while loop < max_iter:
             loop += 1
-            for i in xrange(self.sample):
+            for i in range(self.sample):
                 pred = self.__calc_each(X[:,i])
                 updateItem = self.alpha*(1-pred[y[i],0])*X[:,i].T
                 self.theta[y[i],:] = self.theta[y[i],:]+updateItem.reshape((1,-1))
@@ -35,7 +34,7 @@ class Softmax(SupervisedBaseClass):
     def predict(self, X):
         X = self._format_batch(X)
         X = X.T; result = []
-        for i in xrange(X.shape[1]):
+        for i in range(X.shape[1]):
             pred = self.__calc_each(X[:,i])
             result.append(np.argmax(pred))
         return result

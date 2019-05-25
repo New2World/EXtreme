@@ -68,13 +68,13 @@ class FNN():
         b is the bias
         """
         if weight is None:
-            for i in xrange(self.layers-1):
+            for i in range(self.layers-1):
                 self.W.append(np.random.randn(self.layer_nodes[i],
                               self.layer_nodes[i+1])/np.sqrt(self.layer_nodes[i]))
         else:
             self.W = cp.deepcopy(weight)
         if bias is None:
-            for i in xrange(self.layers-1):
+            for i in range(self.layers-1):
                 self.b.append(np.zeros((1, self.layer_nodes[i+1])))
         else:
             self.b = cp.deepcopy(bias)
@@ -99,7 +99,7 @@ class FNN():
         X is a sample with shape (batch_size, feature)
         """
         self.val.append(X)
-        for i in xrange(self.layers-2):
+        for i in range(self.layers-2):
             z = self.val[-1].dot(self.W[i])+self.b[i]
             self.val.append(self.activation['activation'](z))
         return self.val[-1].dot(self.W[self.layers-2])+self.b[self.layers-2]
@@ -112,7 +112,7 @@ class FNN():
         delta = self.__softmax(z)
         error = self.__calc_error(delta, y)
         delta[range(batch_size), y] -= 1	# NICE CODE
-        for i in xrange(self.layers-2, -1, -1):
+        for i in range(self.layers-2, -1, -1):
             dW = (self.val[i].T).dot(delta)+self.reg_lambda*self.W[i]
             db = np.sum(delta, axis=0, keepdims=True)+self.reg_lambda*self.b[i]
             delta = delta.dot(self.W[i].T)*self.activation['derivation'](self.val[i])
@@ -127,14 +127,14 @@ class FNN():
         X, y = self.__format_data(X, y)
         self.sample, self.feature = X.shape
 
-        print r'Start training...'
+        print ('Start training...')
 
-        for i in xrange(1, epoch+1):
+        for i in range(1, epoch+1):
             batch_train, batch_label = self.__get_batch(X, y, batch_size)
             output_prob = self.__forwardpropagation(batch_train)
             error = self.__backpropagation(output_prob, batch_label, batch_size)
             if show_procedure:
-                print "Epoch #%d: loss: %.6f" % (i, error)
+                print (f"Epoch #{i}: loss: {error}")
             self.val = []
 
     def predict(self, X):
@@ -154,4 +154,4 @@ class FNN():
         """
         output_label = self.predict(X)
         accuracy = 1.*len([item for item in zip(output_label, y) if item[0] == item[1]])/len(y)
-        print "Accuracy: %.6f" % accuracy
+        print (f"Accuracy: {accuracy}")
