@@ -35,3 +35,6 @@ class Softmax(SupervisedBaseClass):
 
     def predict(self, X):
         return np.argmax(self._predict(X), axis=1)
+    
+    def score(self, X, y, output=True):
+        return self._cls_score(X, y, output)

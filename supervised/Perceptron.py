@@ -34,7 +34,7 @@ class Perceptron(SupervisedBaseClass):
         X, y = self._format_batch(X, y)
         if len(set(y)) > 2:
             raise ValueError("only binary classification supported")
-        y = __change_label(y)
+        y = self.__change_label(y)
         self.__W = np.random.rand(X.shape[1])
         self.__bias = 0
         if method == 'normal':
@@ -49,3 +49,6 @@ class Perceptron(SupervisedBaseClass):
 
     def predict(self, X):
         return self.__sign(self._predict(X))
+
+    def score(self, X, y, output=True):
+        return self._cls_score(X, y, output)

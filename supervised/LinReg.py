@@ -26,10 +26,5 @@ class LinReg(SupervisedBaseClass):
     def predict(self, X):
         return self._predict(X)
     
-    def eval(self, X, y, output=True):
-        X, y = self._format_batch(X, y)
-        outp = self._predict(X)
-        mse = np.sum((outp-y)**2)/len(y)
-        if output:
-            print(f"Mean Squared Error: {mse}")
-        return mse
+    def score(self, X, y, output=True):
+        return self._reg_score(X, y, output)

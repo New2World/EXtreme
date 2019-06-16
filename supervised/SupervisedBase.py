@@ -52,20 +52,21 @@ class SupervisedBaseClass():
         """
         raise NotImplementedError
 
-    def predict(self, X):
-        """
-        output
-        defined by sub-class
-        """
-        return self._predict(X)
-
-    def eval(self, X, y, output=True):
+    def _cls_score(self, X, y, output=True):
         """
         calculate the accurary of the model
         """
-        _y = self.predict(X)
+        _y = self._predict(X)
         y = np.array(y); _y = np.array(_y)
         precious = 1-(1.0*len(np.nonzero(y-_y)[0])/len(y))
         if output:
             print(f"Accurary: {precious}")
         return precious
+    
+    def _reg_score(self, X, y, output=True):
+        X, y = self._format_batch(X, y)
+        _y = self._predict(X)
+        mse = np.sum((_y-y)**2)/len(y)
+        if output:
+            print(f"Mean Squared Error: {mse}")
+        return mse
