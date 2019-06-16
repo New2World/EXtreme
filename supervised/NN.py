@@ -3,40 +3,40 @@ import random as rd
 import copy as cp
 
 class FNN():
-    W = []
-    b = []
-    val = []
 
     def __init__(self,
-                 layer_nodes=[2, 3, 2],
-                 activation='sigmoid',
-                 reg_lambda=1e-2,
-                 eta=1e-2,
-                 weight=None,
-                 bias=None):
+                layer_nodes=[2, 3, 2],
+                activation='sigmoid',
+                reg_lambda=1e-2,
+                lr=1e-2,
+                weight=None,
+                bias=None):
         """
         initialization
         """
-        self.reg_lambda = reg_lambda
-        self.eta = eta
-        self.layers = len(layer_nodes)
-        self.layer_nodes = layer_nodes
-        self.activation = self.__parse_activation(activation)
+        self.__W = []
+        self.__b = []
+        self.__val = []
+        self.__reg_lambda = reg_lambda
+        self.__lr = lr
+        self.__layers = len(layer_nodes)
+        self.__layer_nodes = layer_nodes
+        self.__activation = self.__parse_activation(activation)
         self.__build_model(weight, bias)
 
-    def __parse_activation(self, activation):
+    def __parse_activation(self, __activation):
         """
-        get the activation and its corresponding derivation
+        get the __activation and its corresponding derivation
         """
-        func = {'activation':None, 'derivation':None}
-        if activation == 'sigmoid':
-            func['activation'] = lambda x: 1./(1+np.exp(-x))
+        func = {'__activation':None, 'derivation':None}
+        if __activation == 'sigmoid':
+            func['__activation'] = lambda x: 1./(1+np.exp(-x))
             func['derivation'] = lambda x: x*(1-x)
-        elif activation == 'tanh':
-            func['activation'] = lambda x: (np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
+        elif __activation == 'tanh':
+            func['__activation'] = lambda x: (np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
             func['derivation'] = lambda x: 1-np.power(x, 2)
-        elif activation == 'relu':
-            func['activation'] = lambda x: max(0,x)
+        elif __activation == 'relu':
+            func['__activation'] = lambda x: max(0,x)
             func['derivation'] = lambda x: max(0,x/abs(x))
         return func
 
@@ -64,45 +64,44 @@ class FNN():
 
     def __build_model(self, weight, bias):
         """
-        W is the weight with shape consist of two interfacing layers
-        b is the bias
+        __W is the weight with shape consist of two interfacing __layers
+        __b is the bias
         """
         if weight is None:
-            for i in range(self.layers-1):
-                self.W.append(np.random.randn(self.layer_nodes[i],
-                              self.layer_nodes[i+1])/np.sqrt(self.layer_nodes[i]))
+            for i in range(self.__layers-1):
+                self.__W.append(np.random.randn(self.__layer_nodes[i],
+                              self.__layer_nodes[i+1])/np.sqrt(self.__layer_nodes[i]))
         else:
-            self.W = cp.deepcopy(weight)
+            self.__W = cp.deepcopy(weight)
         if bias is None:
-            for i in range(self.layers-1):
-                self.b.append(np.zeros((1, self.layer_nodes[i+1])))
+            for i in range(self.__layers-1):
+                self.__b.append(np.zeros((1, self.__layer_nodes[i+1])))
         else:
-            self.b = cp.deepcopy(bias)
+            self.__b = cp.deepcopy(bias)
 
     def __softmax(self, arr):
         """
         softmax
         """
         exp_scores = np.exp(arr)
-        probs = exp_scores/np.sum(exp_scores, axis=1, keepdims=True)
-        return probs
+        return exp_scores/np.sum(exp_scores, axis=1, keepdims=True)
 
     def __calc_error(self, delta, y):
         log_prob = -np.log(delta[range(delta.shape[0]), y])
         loss = np.sum(log_prob)
-        regularizer_loss = sum(map(lambda x: np.sum(np.square(x)), self.W))
-        loss += self.reg_lambda/2*regularizer_loss
+        regularizer_loss = sum(map(lambda x: np.sum(np.square(x)), self.__W))
+        loss += self.__reg_lambda*regularizer_loss/2
         return loss/len(y)
 
     def __forwardpropagation(self, X):
         """
         X is a sample with shape (batch_size, feature)
         """
-        self.val.append(X)
-        for i in range(self.layers-2):
-            z = self.val[-1].dot(self.W[i])+self.b[i]
-            self.val.append(self.activation['activation'](z))
-        return self.val[-1].dot(self.W[self.layers-2])+self.b[self.layers-2]
+        self.__val.append(X)
+        for i in range(self.__layers-2):
+            z = self.__val[-1].dot(self.__W[i])+self.__b[i]
+            self.__val.append(self.__activation['__activation'](z))
+        return self.__val[-1].dot(self.__W[self.__layers-2])+self.__b[self.__layers-2]
 
     def __backpropagation(self, z, y, batch_size):
         """
@@ -111,13 +110,13 @@ class FNN():
         """
         delta = self.__softmax(z)
         error = self.__calc_error(delta, y)
-        delta[range(batch_size), y] -= 1	# NICE CODE
-        for i in range(self.layers-2, -1, -1):
-            dW = (self.val[i].T).dot(delta)+self.reg_lambda*self.W[i]
-            db = np.sum(delta, axis=0, keepdims=True)+self.reg_lambda*self.b[i]
-            delta = delta.dot(self.W[i].T)*self.activation['derivation'](self.val[i])
-            self.W[i] += -self.eta*dW
-            self.b[i] += -self.eta*db
+        delta[range(batch_size), y] -= 1
+        for i in range(self.__layers-2, -1, -1):
+            dW = (self.__val[i].T).dot(delta)+self.__reg_lambda*self.__W[i]
+            db = np.sum(delta, axis=0, keepdims=True)+self.__reg_lambda*self.__b[i]
+            delta = delta.dot(self.__W[i].T)*self.__activation['derivation'](self.__val[i])
+            self.__W[i] += -self.__lr*dW
+            self.__b[i] += -self.__lr*db
         return error
 
     def train(self, X, y, batch_size=32, epoch=100, show_procedure=True):
@@ -135,7 +134,7 @@ class FNN():
             error = self.__backpropagation(output_prob, batch_label, batch_size)
             if show_procedure:
                 print (f"Epoch #{i}: loss: {error}")
-            self.val = []
+            self.__val = []
 
     def predict(self, X):
         """
@@ -145,7 +144,7 @@ class FNN():
         output = self.__forwardpropagation(X)
         output_prob = self.__softmax(output)
         output_label = np.argmax(output_prob, axis=1)
-        self.val = []
+        self.__val = []
         return output_label
 
     def eval(self, X, y):

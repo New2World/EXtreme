@@ -1,10 +1,10 @@
 import numpy as np
-from SupervisedBase import SupervisedBaseClass
+from .SupervisedBase import SupervisedBaseClass
 
 class LinReg(SupervisedBaseClass):
 
     def __init__(self):
-        pass
+        self.__w = None
 
     def __add_bias(self, X):
         samples = X.shape[0]
@@ -18,7 +18,18 @@ class LinReg(SupervisedBaseClass):
         inv_mat = np.linalg.pinv(temp_mat)
         self.__w = (inv_mat.dot(X.transpose().dot(y.transpose()))).transpose()
 
-    def predict(self, X):
+    def _predict(self, X):
         X = self._format_batch(X)
         X = self.__add_bias(X)
-        return (self.__w.dot(X.transpose())).tolist()
+        return self.__w.dot(X.transpose())
+    
+    def predict(self, X):
+        return self._predict(X)
+    
+    def eval(self, X, y, output=True):
+        X, y = self._format_batch(X, y)
+        outp = self._predict(X)
+        mse = np.sum((outp-y)**2)/len(y)
+        if output:
+            print(f"Mean Squared Error: {mse}")
+        return mse
