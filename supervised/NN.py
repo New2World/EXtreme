@@ -26,20 +26,20 @@ class FNN(SupervisedBaseClass):
         self.__activation = self.__parse_activation(activation)
         self.__build_model(weight, bias)
 
-    def __parse_activation(self, __activation):
+    def __parse_activation(self, activation):
         """
-        get the __activation and its corresponding derivation
+        get the activation and its corresponding derivation
         """
-        func = {'__activation':None, 'derivation':None}
-        if __activation == 'sigmoid':
-            func['__activation'] = lambda x: 1./(1+np.exp(-x))
+        func = {'activation':None, 'derivation':None}
+        if activation == 'sigmoid':
+            func['activation'] = lambda x: 1./(1+np.exp(-x))
             func['derivation'] = lambda x: x*(1-x)
-        elif __activation == 'tanh':
-            func['__activation'] = lambda x: (np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
+        elif activation == 'tanh':
+            func['activation'] = lambda x: (np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
             func['derivation'] = lambda x: 1-np.power(x, 2)
-        elif __activation == 'relu':
-            func['__activation'] = lambda x: max(0,x)
-            func['derivation'] = lambda x: max(0,x/abs(x))
+        elif activation == 'relu':
+            func['activation'] = lambda x: np.abs(x*(x>0))
+            func['derivation'] = lambda x: np.ones(x.shape)*(x>0)
         return func
 
     def __build_model(self, weight, bias):
@@ -81,7 +81,7 @@ class FNN(SupervisedBaseClass):
         self.__val.append(X)
         for i in range(self.__layers-2):
             z = self.__val[-1].dot(self.__W[i])+self.__b[i]
-            self.__val.append(self.__activation['__activation'](z))
+            self.__val.append(self.__activation['activation'](z))
         output = self.__val[-1].dot(self.__W[self.__layers-2])+self.__b[self.__layers-2]
         return self.__softmax(output)
 
@@ -92,7 +92,7 @@ class FNN(SupervisedBaseClass):
         """
         for i in range(self.__layers-2, -1, -1):
             dW = (self.__val[i].T).dot(delta)+self.__reg_lambda*self.__W[i]
-            db = np.sum(delta, axis=0, keepdims=True)+self.__reg_lambda*self.__b[i]
+            db = np.sum(delta, axis=0, keepdims=True)
             delta = delta.dot(self.__W[i].T)*self.__activation['derivation'](self.__val[i])
             self.__W[i] += -self.__lr*dW
             self.__b[i] += -self.__lr*db
