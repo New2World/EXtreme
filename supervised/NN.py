@@ -64,7 +64,7 @@ class FNN(SupervisedBaseClass):
         softmax
         """
         exp_scores = np.exp(arr)
-        return exp_scores/np.sum(exp_scores, axis=1, keepdims=True)
+        return exp_scores/(np.sum(exp_scores, axis=1, keepdims=True)+1e-9)
 
     def _error_calc(self, pred, y):
         pred[range(pred.shape[0]), y] -= 1
