@@ -7,7 +7,13 @@ Self-implement fundamental machine learning algorithms.
 ### Machine Learning Algorithm
 
 - [x] linear regression  
+- [x] Logistic regression
 - [x] softmax  
 - [x] perceptron  
 - [x] full-connected neural network  
-- [ ] TODO
+- [x] decision tree  
+- [ ] naive Bayes  
+- [ ] K-nearest neighbor  
+- [ ] K means  
+- [ ] Bagging
+- [ ] Boosting
