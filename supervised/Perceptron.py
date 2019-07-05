@@ -4,21 +4,9 @@ from .SupervisedBase import SupervisedBaseClass
 class Perceptron(SupervisedBaseClass):
 
     def __init__(self, lr=1e-3):
+        self.__w = None
+        self.__b = None
         self.__lr = lr
-        self.__W = None
-        self.__bias = None
-    
-    def __change_label(self, y):
-        y[y==0] = -1
-        return y
-
-    def __sign(self, arr):
-        for i in range(len(arr)):
-            if arr[i] < 0:
-                arr[i] = -1
-            else:
-                arr[i] = 1
-        return arr
 
     def _error_calc(self, pred, y):
         diff = pred-y
@@ -27,16 +15,19 @@ class Perceptron(SupervisedBaseClass):
 
     def _update(self, X, y, err):
         for j in err[1]:
-            self.__W = self.__W+self.__lr*y[j]*X[j].transpose()
-            self.__bias = self.__bias+self.__lr*y[j]
+            dw = X[j].T
+            db = 1.
+            if y[j] == 0:
+                dw, db = -dw, -db
+            self.__w = self.__w+self.__lr*dw
+            self.__b = self.__b+self.__lr*db
 
     def train(self, X, y, batch_size=64, epoch=100, method='normal'):
         X, y = self._format_batch(X, y)
         if len(set(y)) > 2:
             raise ValueError("only binary classification supported")
-        y = self.__change_label(y)
-        self.__W = np.random.rand(X.shape[1])
-        self.__bias = 0
+        self.__w = np.random.rand(X.shape[1])
+        self.__b = 0
         if method == 'normal':
             self._optimize_gd(X, y, batch_size, epoch)
         elif method == 'dual':
@@ -44,11 +35,11 @@ class Perceptron(SupervisedBaseClass):
     
     def _predict(self, X):
         X = self._format_batch(X)
-        pred = X.dot(self.__W).flatten()+self.__bias
+        pred = X.dot(self.__w).flatten()+self.__b
         return pred
 
     def predict(self, X):
-        return self.__sign(self._predict(X))
+        return self._sign(self._predict(X))
 
     def score(self, X, y, output=True):
         return self._cls_score(X, y, output)
