@@ -39,6 +39,9 @@ class SupervisedBaseClass():
         raise NotImplementedError
 
     def _optimize_gd(self, X, y, batch_size, epoch):
+        '''
+        gradient descent optimization
+        '''
         for _ in range(epoch):
             next_batch = self._batch_generator(X, y, batch_size)
             while True:
@@ -76,6 +79,9 @@ class SupervisedBaseClass():
         return precious
     
     def _reg_score(self, X, y, output=True):
+        """
+        calculate the accurary of the model
+        """
         X, y = self._format_batch(X, y)
         _y = self.predict(X)
         mse = np.sum((_y-y)**2)/len(y)
