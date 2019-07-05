@@ -11,6 +11,11 @@ class SupervisedBaseClass():
             return result[0]
         return result
     
+    def _sign(self, y, thresh=0):
+        y[y>=thresh] = 1
+        y[y<thresh] = 0
+        return y
+    
     def _batch_generator(self, X, y, batch_size):
         n_samples = X.shape[0]
         rand_index = np.arange(n_samples)
@@ -47,7 +52,14 @@ class SupervisedBaseClass():
 
     def _predict(self, X):
         """
-        output
+        output prediction
+        defined by sub-class
+        """
+        raise NotImplementedError
+    
+    def predict(self, X):
+        """
+        output prediction
         defined by sub-class
         """
         raise NotImplementedError
@@ -56,16 +68,16 @@ class SupervisedBaseClass():
         """
         calculate the accurary of the model
         """
-        _y = self._predict(X)
+        _y = self.predict(X)
         y = np.array(y); _y = np.array(_y)
         precious = 1-(1.0*len(np.nonzero(y-_y)[0])/len(y))
         if output:
-            print(f"Accurary: {precious}")
+            print(f"Accuracy: {precious}")
         return precious
     
     def _reg_score(self, X, y, output=True):
         X, y = self._format_batch(X, y)
-        _y = self._predict(X)
+        _y = self.predict(X)
         mse = np.sum((_y-y)**2)/len(y)
         if output:
             print(f"Mean Squared Error: {mse}")
