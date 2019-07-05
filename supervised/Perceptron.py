@@ -22,7 +22,7 @@ class Perceptron(SupervisedBaseClass):
             self.__w = self.__w+self.__lr*dw
             self.__b = self.__b+self.__lr*db
 
-    def train(self, X, y, batch_size=64, epoch=100, method='normal'):
+    def train(self, X, y, batch_size=32, epoch=100, method='normal'):
         X, y = self._format_batch(X, y)
         if len(set(y)) > 2:
             raise ValueError("only binary classification supported")
