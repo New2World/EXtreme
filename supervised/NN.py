@@ -109,19 +109,16 @@ class FNN(SupervisedBaseClass):
         X = self._format_batch(X)
         return self.__forwardpropagation(X)
 
-    def predict(self, X):
+    def forward(self, X):
         """
         its kernel is the forward propagation precedure
         """
         output = self._predict(X)
         self.__val = []
         return output
+    
+    def predict(self, X):
+        return np.argmax(self._predict(X), axis=1)
 
     def score(self, X, y, output=True):
-        """
-        predict with forward propagation and evaluate the result
-        """
-        output_prob = self.predict(X)
-        output_label = np.argmax(output_prob, axis=1)
-        accuracy = 1-(1.0*len(np.nonzero(y-output_label)[0])/len(y))
-        print (f"Accuracy: {accuracy}")
+        return self._cls_score(X, y, output)
