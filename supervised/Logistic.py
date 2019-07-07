@@ -15,10 +15,10 @@ class Logistic(SupervisedBaseClass):
         return 1/(1+np.exp(-self.__linear(x)))
     
     def _error_calc(self, pred, y):
-        '''
+        """
         cost(h(x), y) = -log(h(x)) when y == 1, or -log(1-h(x)) when y == 0;
-        J = -\frac1m [\sum\limits_{i=1}^m [y_i \log{h(x_i)} + (1-y_i) \log{1-h(x_i)}]]
-        '''
+        J = -1/m [sum_{i=1}^m [y_i log{h(x_i)} + (1-y_i) log{1-h(x_i)}]]
+        """
         return np.sum(pred-y)
     
     def _update(self, X, y, err):

@@ -14,14 +14,14 @@ class LinReg(SupervisedBaseClass):
     def train(self, X, y):
         X, y = self._format_batch(X, y)
         X = self.__add_bias(X)
-        temp_mat = X.transpose().dot(X)
+        temp_mat = X.T.dot(X)
         inv_mat = np.linalg.pinv(temp_mat)
-        self.__w = (inv_mat.dot(X.transpose().dot(y.transpose()))).transpose()
+        self.__w = (inv_mat.dot(X.T.dot(y.T))).T
 
     def _predict(self, X):
         X = self._format_batch(X)
         X = self.__add_bias(X)
-        return self.__w.dot(X.transpose())
+        return self.__w.dot(X.T)
     
     def predict(self, X):
         return self._predict(X)
