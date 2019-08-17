@@ -12,7 +12,7 @@ Self-implement fundamental machine learning algorithms.
 - [x] perceptron  
 - [x] full-connected neural network  
 - [x] decision tree  
-- [ ] naive Bayes  
+- [x] naive Bayes  
 - [ ] K-nearest neighbor  
 - [ ] K means  
 - [ ] Bagging
