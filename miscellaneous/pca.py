@@ -10,24 +10,16 @@ whiten = data - data.mean(axis=0)
 whiten = cp.asarray(whiten)
 cov = whiten.T @ whiten
 
-ss, vs = cp.linalg.eigh(cov)
+us, vals, vs = cp.linalg.svd(cov)     # svd
+# vals, us = cp.linalg.eigh(cov)        # eig
 
-indices = cp.argsort(ss)[::-1]
+k = 10
 
-ss = ss[indices]
-vs = vs[:,indices]
+indices = cp.argsort(vals)[::-1]
+us = us[:,indices]
+u = us[:,:k]
 
-sumover = ss.sum()
-k = 0
-eig_feat = 0.
-while eig_feat < .95*sumover:
-    eig_feat += ss[k]
-    k += 1
-
-eigval = ss[:k]
-eigvec = vs[:,:k]
-
-feat_face = (cov @ eigvec).T
+feat_face = (cov @ u).T
 
 print(f'keep top-{k} dimensions')
 
