@@ -7,7 +7,8 @@ Self-implement fundamental machine learning algorithms.
 ### Machine Learning Algorithm
 
 - [x] linear regression  
-- [x] Logistic regression
+- [x] Logistic regression  
+- [x] linear discriminant analysis  
 - [x] softmax  
 - [x] perceptron  
 - [x] full-connected neural network  
