@@ -122,3 +122,8 @@ class FNN(SupervisedBaseClass):
 
     def score(self, X, y, output=True):
         return self._cls_score(X, y, output)
+
+'''
+- Why separate W and b?
+- There will be a dimensional problem computing delta, and it might lead to some extra operations handling that.
+'''
