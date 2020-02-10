@@ -2,7 +2,7 @@ import numpy as np
 import random as rd
 import copy as cp
 
-from .SupervisedBase import SupervisedBaseClass
+from supervised.SupervisedBase import SupervisedBaseClass as SupervisedBaseClass
 
 class FNN(SupervisedBaseClass):
 

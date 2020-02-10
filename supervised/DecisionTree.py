@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from .SupervisedBase import SupervisedBaseClass
+from supervised.SupervisedBase import SupervisedBaseClass as SupervisedBaseClass
 
 class _tree_node(object):
     def __init__(self, feat_id, label):

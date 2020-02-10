@@ -1,5 +1,5 @@
 data/
-*_test.py
+testScript.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

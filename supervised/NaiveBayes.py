@@ -1,5 +1,5 @@
 import numpy as np
-from .SupervisedBase import SupervisedBaseClass
+from supervised.SupervisedBase import SupervisedBaseClass as SupervisedBaseClass
 
 class NaiveBayes(SupervisedBaseClass):
     def __init__(self, eps=1e-6, *args):

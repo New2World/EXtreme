@@ -1,5 +1,5 @@
 import numpy as np
-from .SupervisedBase import SupervisedBaseClass
+from supervised.SupervisedBase import SupervisedBaseClass as SupervisedBaseClass
 
 class LDA(SupervisedBaseClass):
     def __init__(self, thresh=0.95):
